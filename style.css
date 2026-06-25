@@ -66,7 +66,6 @@ body {
 
 .app {
   border: 1px solid var(--border-light);
-  border-radius: var(--r-lg);
   overflow: hidden;
   background: var(--bg-primary);
   display: flex;
