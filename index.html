@@ -1,493 +1,142 @@
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg-primary:#ffffff;--bg-secondary:#f5f4f1;--bg-tertiary:#eeede9;
-  --text-primary:#1a1a18;--text-secondary:#5a5a56;--text-tertiary:#8a8a84;
-  --border-light:rgba(0,0,0,0.10);--border-med:rgba(0,0,0,0.18);
-  --blue:#185fa5;--blue-bg:#e6f1fb;--blue-text:#0c447c;--blue-border:#85b7eb;
-  --green:#1e8a44;--red-text:#a32d2d;--red-bg:#fcebeb;--red-border:#f09595;
-  --r-md:8px;--r-lg:12px;
-}
-@media(prefers-color-scheme:dark){:root{
-  --bg-primary:#1e1e1c;--bg-secondary:#262624;--bg-tertiary:#2e2e2b;
-  --text-primary:#e8e7e2;--text-secondary:#a0a09a;--text-tertiary:#686862;
-  --border-light:rgba(255,255,255,0.08);--border-med:rgba(255,255,255,0.16);
-  --blue:#378add;--blue-bg:#0c1e32;--blue-text:#85b7eb;--blue-border:#185fa5;
-  --green:#3db86b;--red-text:#f09595;--red-bg:#280e0e;--red-border:#a32d2d;
-}}
-body,div,button,span{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
-.app{border:1px solid var(--border-light);border-radius:var(--r-lg);overflow:hidden;background:var(--bg-primary);}
-
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border-light);gap:10px;background:var(--bg-primary);}
-.topbar-left{display:flex;align-items:center;gap:8px;}
-.app-title{font-size:14px;font-weight:600;color:var(--text-primary);}
-.nbadge{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-light);}
-.topbar-right{display:flex;gap:6px;}
-
-.tbgroup{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--border-light);flex-wrap:wrap;align-items:center;background:var(--bg-primary);}
-.grp-label{font-size:10px;color:var(--text-tertiary);letter-spacing:.05em;padding:0 4px;user-select:none;}
-.grp-sep{width:1px;height:18px;background:var(--border-light);margin:0 4px;flex-shrink:0;}
-
-.tb{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:5px 11px;border-radius:var(--r-md);border:1px solid var(--border-med);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;transition:background .12s,color .12s,border-color .12s;white-space:nowrap;line-height:1.3;outline:none;}
-.tb:hover{background:var(--bg-tertiary);color:var(--text-primary);border-color:var(--border-med);}
-.tb:active{transform:scale(.97);}
-.tb.active{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);}
-.tb.red{color:var(--red-text);border-color:var(--red-border);background:var(--bg-secondary);}
-.tb.red:hover{background:var(--red-bg);}
-.tb.red.active{background:var(--red-bg);color:var(--red-text);border-color:var(--red-border);}
-
-.send-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 14px;border-radius:var(--r-md);border:1px solid var(--blue-border);background:var(--blue-bg);color:var(--blue-text);cursor:pointer;transition:opacity .12s;line-height:1.3;outline:none;}
-.send-btn:hover{opacity:.8;}
-.send-btn:active{transform:scale(.97);}
-.reset-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--r-md);border:1px solid var(--border-med);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;transition:background .12s,color .12s;line-height:1.3;outline:none;}
-.reset-btn:hover{background:var(--bg-tertiary);color:var(--text-primary);}
-.reset-btn:active{transform:scale(.97);}
-
-.canvas-outer{position:relative;width:100%;background:var(--bg-secondary);}
-canvas{display:block;width:100%;height:auto;}
-
-.footer{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-top:1px solid var(--border-light);gap:8px;flex-wrap:wrap;background:var(--bg-primary);}
-.statusbar{font-size:12px;color:var(--text-secondary);flex:1;min-width:0;line-height:1.4;}
-.legend{display:flex;gap:10px;flex-wrap:wrap;}
-.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-tertiary);}
-.legdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1.5px solid transparent;}
-</style>
-
-<div class="app">
-  <div class="topbar">
-    <div class="topbar-left">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-secondary)"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/><line x1="7" y1="19" x2="17" y2="19"/></svg>
-      <span class="app-title">Simulador de red</span>
-      <span class="nbadge" id="badge">8 nodos</span>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Red</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="topbar-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary)">
+          <circle cx="12" cy="5" r="2"/>
+          <circle cx="5" cy="19" r="2"/>
+          <circle cx="19" cy="19" r="2"/>
+          <line x1="12" y1="7" x2="5" y2="17"/>
+          <line x1="12" y1="7" x2="19" y2="17"/>
+          <line x1="7" y1="19" x2="17" y2="19"/>
+        </svg>
+        <span class="app-title">Simulador de red</span>
+        <span class="nbadge" id="badge">8 nodos</span>
+      </div>
+      <div class="topbar-right">
+        <button class="reset-btn" id="btn-reset">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+          </svg>
+          Resetear
+        </button>
+        <button class="send-btn" id="btn-send">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Enviar
+        </button>
+      </div>
     </div>
-    <div class="topbar-right">
-      <button class="reset-btn" onclick="resetAll()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
-        Resetear
+
+    <div class="tbgroup">
+      <span class="grp-label">EDITAR</span>
+      <button class="tb active" id="btn-pointer">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 3l14 9-7 1-4 7z"/>
+        </svg>
+        Mover
       </button>
-      <button class="send-btn" onclick="sendPacket()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Enviar
+      <button class="tb" id="btn-add">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Agregar
+      </button>
+      <button class="tb red" id="btn-delete">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14H6L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+        </svg>
+        Eliminar
+      </button>
+
+      <div class="grp-sep"></div>
+      <span class="grp-label">ASIGNAR</span>
+      <button class="tb" id="btn-source">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Emisor
+      </button>
+      <button class="tb" id="btn-dest">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="3" fill="currentColor"/>
+        </svg>
+        Receptor
+      </button>
+
+      <div class="grp-sep"></div>
+      <button class="tb" id="btn-toggle">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+          <line x1="12" y1="2" x2="12" y2="12"/>
+        </svg>
+        On/Off
+      </button>
+
+      <div class="grp-sep"></div>
+      <span class="grp-label">CONEXIONES</span>
+      <button class="tb" id="btn-connect">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        Conectar
+      </button>
+      <button class="tb red" id="btn-disconnect">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        Desconectar
       </button>
     </div>
-  </div>
 
-  <div class="tbgroup">
-    <span class="grp-label">EDITAR</span>
-    <button class="tb active" id="btn-pointer" onclick="setTool('pointer')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-7 1-4 7z"/></svg>
-      Mover
-    </button>
-    <button class="tb" id="btn-add" onclick="setTool('add')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Agregar
-    </button>
-    <button class="tb red" id="btn-delete" onclick="setTool('delete')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-      Eliminar
-    </button>
-    <div class="grp-sep"></div>
-    <span class="grp-label">ASIGNAR</span>
-    <button class="tb" id="btn-source" onclick="setTool('source')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Emisor
-    </button>
-    <button class="tb" id="btn-dest" onclick="setTool('dest')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
-      Receptor
-    </button>
-    <div class="grp-sep"></div>
-    <button class="tb" id="btn-toggle" onclick="setTool('toggle')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
-      On/Off
-    </button>
-    <div class="grp-sep"></div>
-    <span class="grp-label">CONEXIONES</span>
-    <button class="tb" id="btn-connect" onclick="setTool('connect')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-      Conectar
-    </button>
-    <button class="tb red" id="btn-disconnect" onclick="setTool('disconnect')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-      Desconectar
-    </button>
-  </div>
+    <div class="canvas-outer" id="canvas-outer">
+      <canvas id="c"></canvas>
+    </div>
 
-  <div class="canvas-outer" id="canvas-outer">
-    <canvas id="c"></canvas>
-  </div>
-
-  <div class="footer">
-    <div class="statusbar" id="status">Elegí una herramienta para comenzar.</div>
-    <div class="legend">
-      <div class="leg"><span class="legdot" style="background:#5b87e0;border-color:#3a5fa8"></span>Activo</div>
-      <div class="leg"><span class="legdot" style="background:#b0b0ac;border-color:#888"></span>Apagado</div>
-      <div class="leg"><span class="legdot" style="background:#3db86b;border-color:#1e8a44"></span>TX</div>
-      <div class="leg"><span class="legdot" style="background:#e05b5b;border-color:#a83333"></span>RX</div>
-      <div class="leg"><span class="legdot" style="background:#f5a623;border-color:#b87a10"></span>Paquete</div>
+    <div class="footer">
+      <div class="statusbar" id="status">Elegí una herramienta para comenzar.</div>
+      <div class="legend">
+        <div class="leg">
+          <span class="legdot" style="background: #5b87e0; border-color: #3a5fa8"></span>
+          Activo
+        </div>
+        <div class="leg">
+          <span class="legdot" style="background: #b0b0ac; border-color: #888"></span>
+          Apagado
+        </div>
+        <div class="leg">
+          <span class="legdot" style="background: #3db86b; border-color: #1e8a44"></span>
+          TX
+        </div>
+        <div class="leg">
+          <span class="legdot" style="background: #e05b5b; border-color: #a83333"></span>
+          RX
+        </div>
+        <div class="leg">
+          <span class="legdot" style="background: #f5a623; border-color: #b87a10"></span>
+          Paquete
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-const outer=document.getElementById('canvas-outer');
-const cv=document.getElementById('c');
-const ctx=cv.getContext('2d');
-let DPR=window.devicePixelRatio||1,CW=0,CH=0;
-const ALPHA='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const R=22;
-let tool='pointer',nodes=[],edges=[],srcNode=null,dstNode=null;
-let animId=null,dragging=null,dragOffX=0,dragOffY=0,hoveredNode=null;
-let pathHL=[],packetPos=null,packetEdgeIdx=0,packetT=0,addCtr=8;
-let connectStart=null,hoveredEdge=null,mouseX=0,mouseY=0;
-
-function isDark(){return matchMedia('(prefers-color-scheme:dark)').matches;}
-
-function pal(){
-  const d=isDark();
-  return{
-    bg:d?'#1e1e1c':'#f0efeb',
-    grid:d?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.035)',
-    edge:d?'#3a3a36':'#c8c7c0',
-    edgeDead:d?'#262624':'#e2e1db',
-    pathEdge:'#c8880a',
-    nodeActive:d?'#4a76d4':'#5b87e0',nodeActiveBr:d?'#2a4fa4':'#3a5fa8',
-    nodeOff:d?'#363634':'#bebdb8',nodeOffBr:d?'#282826':'#a0a09a',
-    nodeSrc:'#3db86b',nodeSrcBr:'#1e8a44',
-    nodeDst:'#e05b5b',nodeDstBr:'#a83333',
-    nodePath:'#7c5ce0',nodePathBr:'#5a3fa4',
-    pkt:'#f5a623',pktBr:'#b87a10',
-    lblOn:'#fff',lblOff:d?'#555':'#b8b8b0',
-    hover:d?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',
-  };
-}
-
-function resize(){
-  DPR=window.devicePixelRatio||1;
-  const rect=outer.getBoundingClientRect();
-  CW=rect.width; CH=Math.round(CW*0.60);
-  cv.width=Math.round(CW*DPR); cv.height=Math.round(CH*DPR);
-  cv.style.width=CW+'px'; cv.style.height=CH+'px';
-  ctx.setTransform(DPR,0,0,DPR,0,0);
-  draw();
-}
-new ResizeObserver(()=>resize()).observe(outer);
-
-function nodeR(){return Math.max(14,Math.round(CW*0.033));}
-
-function initNetwork(){
-  if(animId){cancelAnimationFrame(animId);animId=null;}
-  const px=x=>Math.round(x*CW),py=y=>Math.round(y*CH);
-  nodes=[
-    {id:0,x:px(.17),y:py(.20),on:true,label:'A'},
-    {id:1,x:px(.44),y:py(.14),on:true,label:'B'},
-    {id:2,x:px(.72),y:py(.20),on:true,label:'C'},
-    {id:3,x:px(.17),y:py(.54),on:true,label:'D'},
-    {id:4,x:px(.44),y:py(.50),on:true,label:'E'},
-    {id:5,x:px(.72),y:py(.54),on:true,label:'F'},
-    {id:6,x:px(.30),y:py(.82),on:true,label:'G'},
-    {id:7,x:px(.60),y:py(.82),on:true,label:'H'},
-  ];
-  edges=[[0,1],[1,2],[0,3],[1,4],[2,5],[3,4],[4,5],[3,6],[4,7],[5,7],[6,7]];
-  srcNode=0;dstNode=2;pathHL=[];packetPos=null;addCtr=8;
-  updBadge();
-  setStatus('Red lista — presioná <b>Enviar</b> para ver el mensaje viajar.');
-  draw();
-}
-
-function getNode(id){return nodes.find(n=>n.id===id)||null;}
-
-function bfs(src,dst){
-  if(src===dst)return[src];
-  const vis=new Set([src]),q=[[src]];
-  while(q.length){
-    const path=q.shift(),cur=path[path.length-1];
-    for(const[a,b]of edges){
-      const nb=a===cur?b:b===cur?a:-1;
-      if(nb===-1||vis.has(nb))continue;
-      const nn=getNode(nb);if(!nn||!nn.on)continue;
-      const np=[...path,nb];
-      if(nb===dst)return np;
-      vis.add(nb);q.push(np);
-    }
-  }
-  return null;
-}
-
-function sendPacket(){
-  if(animId){cancelAnimationFrame(animId);animId=null;}
-  pathHL=[];packetPos=null;
-  if(srcNode===null||dstNode===null){setStatus('Asigná un <b>emisor</b> y un <b>receptor</b> primero.');draw();return;}
-  const ns=getNode(srcNode),nd=getNode(dstNode);
-  if(!ns||!ns.on){setStatus('El emisor está apagado.');draw();return;}
-  if(!nd||!nd.on){setStatus('El receptor está apagado.');draw();return;}
-  if(srcNode===dstNode){setStatus('Emisor y receptor son el mismo nodo.');draw();return;}
-  const path=bfs(srcNode,dstNode);
-  if(!path){setStatus('Sin ruta — todos los caminos están bloqueados.');draw();return;}
-  pathHL=path;packetEdgeIdx=0;packetT=0;
-  setStatus('Enviando: '+path.map(i=>getNode(i).label).join(' → '));
-  animatePacket();
-}
-
-function animatePacket(){
-  packetT+=0.038;
-  if(packetT>=1){packetT=0;packetEdgeIdx++;}
-  if(packetEdgeIdx>=pathHL.length-1){
-    const last=getNode(pathHL[pathHL.length-1]);
-    packetPos={x:last.x,y:last.y};draw();
-    setStatus('✓ Entregado a <b>'+(getNode(dstNode)||{label:'?'}).label+'</b> — ruta: '+pathHL.map(i=>getNode(i).label).join(' → '));
-    setTimeout(()=>{packetPos=null;pathHL=[];draw();},1500);
-    animId=null;return;
-  }
-  const a=getNode(pathHL[packetEdgeIdx]),b=getNode(pathHL[packetEdgeIdx+1]);
-  if(!a||!b){animId=null;return;}
-  packetPos={x:a.x+(b.x-a.x)*packetT,y:a.y+(b.y-a.y)*packetT};
-  draw();animId=requestAnimationFrame(animatePacket);
-}
-
-function draw(){
-  if(!CW)return;
-  const c=pal(),nr=nodeR();
-  ctx.clearRect(0,0,CW,CH);
-  ctx.fillStyle=c.bg;ctx.fillRect(0,0,CW,CH);
-
-  const step=Math.round(CW/17);
-  ctx.strokeStyle=c.grid;ctx.lineWidth=1;
-  for(let x=0;x<CW;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,CH);ctx.stroke();}
-  for(let y=0;y<CH;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(CW,y);ctx.stroke();}
-
-  const pSet=new Set();
-  for(let i=0;i<pathHL.length-1;i++)pSet.add([pathHL[i],pathHL[i+1]].sort().join('-'));
-
-  ctx.lineCap='round';
-  for(const[a,b]of edges){
-    const na=getNode(a),nb=getNode(b);if(!na||!nb)continue;
-    const isHL=pSet.has([a,b].sort().join('-'));
-    ctx.beginPath();ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);
-    if(isHL){ctx.strokeStyle=c.pathEdge;ctx.lineWidth=3;ctx.setLineDash([]);}
-    else if(!na.on||!nb.on){ctx.strokeStyle=c.edgeDead;ctx.lineWidth=1.5;ctx.setLineDash([5,5]);}
-    else{ctx.strokeStyle=c.edge;ctx.lineWidth=1.5;ctx.setLineDash([]);}
-    ctx.stroke();ctx.setLineDash([]);
-  }
-
-  for(const n of nodes){
-    let fill,border;
-    if(!n.on){fill=c.nodeOff;border=c.nodeOffBr;}
-    else if(n.id===srcNode&&n.id===dstNode){fill='#c97cd4';border='#8a3a96';}
-    else if(n.id===srcNode){fill=c.nodeSrc;border=c.nodeSrcBr;}
-    else if(n.id===dstNode){fill=c.nodeDst;border=c.nodeDstBr;}
-    else if(pathHL.includes(n.id)){fill=c.nodePath;border=c.nodePathBr;}
-    else{fill=c.nodeActive;border=c.nodeActiveBr;}
-
-    if(hoveredNode===n.id&&tool!=='add'){
-      ctx.beginPath();ctx.arc(n.x,n.y,nr+7,0,Math.PI*2);
-      ctx.fillStyle=c.hover;ctx.fill();
-    }
-    ctx.beginPath();ctx.arc(n.x,n.y,nr,0,Math.PI*2);
-    ctx.fillStyle=fill;ctx.fill();
-    ctx.strokeStyle=border;ctx.lineWidth=2;ctx.stroke();
-
-    if(!n.on){
-      ctx.save();ctx.strokeStyle=isDark()?'#666':'#ccc';ctx.lineWidth=2;ctx.lineCap='round';
-      const s=Math.round(nr*.38);
-      ctx.beginPath();ctx.moveTo(n.x-s,n.y-s);ctx.lineTo(n.x+s,n.y+s);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(n.x+s,n.y-s);ctx.lineTo(n.x-s,n.y+s);ctx.stroke();
-      ctx.restore();
-    }
-
-    const fs=Math.max(11,Math.round(nr*0.62));
-    ctx.fillStyle=n.on?c.lblOn:c.lblOff;
-    ctx.font=`bold ${fs}px -apple-system,sans-serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(n.label,n.x,n.y);
-
-    const tagFs=Math.max(9,Math.round(nr*0.44));
-    ctx.font=`${tagFs}px -apple-system,sans-serif`;
-    if(n.id===srcNode){ctx.fillStyle=c.nodeSrcBr;ctx.fillText('TX',n.x,n.y+nr+tagFs+2);}
-    if(n.id===dstNode){ctx.fillStyle=c.nodeDstBr;ctx.fillText('RX',n.x,n.y+nr+(n.id===srcNode?tagFs*2+4:tagFs+2));}
-  }
-
-  if(packetPos){
-    const pr=Math.max(7,Math.round(CW*0.012));
-    ctx.beginPath();ctx.arc(packetPos.x,packetPos.y,pr,0,Math.PI*2);
-    ctx.fillStyle=c.pkt;ctx.fill();ctx.strokeStyle=c.pktBr;ctx.lineWidth=2;ctx.stroke();
-    ctx.beginPath();ctx.arc(packetPos.x,packetPos.y,pr+5,0,Math.PI*2);
-    ctx.strokeStyle=c.pkt+'55';ctx.lineWidth=1;ctx.stroke();
-  }
-
-  if(tool==='connect'&&connectStart!==null){
-    const ns=getNode(connectStart);
-    if(ns){
-      ctx.beginPath();ctx.moveTo(ns.x,ns.y);ctx.lineTo(mouseX,mouseY);
-      ctx.strokeStyle='#3db86b';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);
-    }
-  }
-
-  if(tool==='disconnect'&&hoveredEdge!==null){
-    const[a,b]=edges[hoveredEdge];
-    const na=getNode(a),nb=getNode(b);
-    if(na&&nb){
-      ctx.beginPath();ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);
-      ctx.strokeStyle='#e05b5b';ctx.lineWidth=4;ctx.setLineDash([]);ctx.stroke();
-    }
-  }
-}
-
-function getNodeAt(x,y){
-  const nr=nodeR();
-  for(const n of nodes)if(Math.hypot(n.x-x,n.y-y)<=nr+6)return n.id;
-  return null;
-}
-
-function distToSegment(px,py,ax,ay,bx,by){
-  const dx=bx-ax,dy=by-ay;
-  const lenSq=dx*dx+dy*dy;
-  if(lenSq===0)return Math.hypot(px-ax,py-ay);
-  let t=((px-ax)*dx+(py-ay)*dy)/lenSq;
-  t=Math.max(0,Math.min(1,t));
-  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
-}
-
-function getEdgeAt(x,y){
-  const threshold=8;
-  for(let i=0;i<edges.length;i++){
-    const[a,b]=edges[i];
-    const na=getNode(a),nb=getNode(b);
-    if(!na||!nb)continue;
-    if(distToSegment(x,y,na.x,na.y,nb.x,nb.y)<=threshold)return i;
-  }
-  return null;
-}
-
-function edgeExists(a,b){
-  return edges.some(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-}
-
-function evXY(e,touch){
-  const r=cv.getBoundingClientRect();
-  const cl=touch?e.changedTouches[0]:e;
-  return{x:(cl.clientX-r.left)*CW/r.width,y:(cl.clientY-r.top)*CH/r.height};
-}
-
-function handleClick(x,y){
-  const nid=getNodeAt(x,y);
-  if(tool==='disconnect'){
-    const eidx=getEdgeAt(x,y);
-    if(eidx===null){
-      setStatus('Clic sobre una conexión para eliminarla.');
-      return;
-    }
-    const[a,b]=edges[eidx];
-    edges.splice(eidx,1);
-    pathHL=[];packetPos=null;
-    setStatus('Conexión eliminada: <b>'+getNode(a).label+'</b> — <b>'+getNode(b).label+'</b>.');
-    draw();return;
-  }
-  if(tool==='add'){
-    if(nid!==null)return;
-    const label=addCtr<ALPHA.length?ALPHA[addCtr]:String(addCtr);
-    const newId=nodes.length?Math.max(...nodes.map(n=>n.id))+1:0;
-    nodes.push({id:newId,x,y,on:true,label});addCtr++;
-    pathHL=[];packetPos=null;setStatus('Nodo <b>'+label+'</b> agregado. Usá <b>Conectar</b> para enlazarlo.');updBadge();draw();return;
-  }
-  if(nid===null)return;
-  if(tool==='delete'){
-    const lbl=getNode(nid).label;
-    nodes=nodes.filter(n=>n.id!==nid);edges=edges.filter(([a,b])=>a!==nid&&b!==nid);
-    if(srcNode===nid)srcNode=null;if(dstNode===nid)dstNode=null;
-    pathHL=[];packetPos=null;setStatus('Nodo <b>'+lbl+'</b> eliminado.');updBadge();draw();return;
-  }
-  if(tool==='source'){
-    if(nid===dstNode){setStatus('Ese nodo ya es el receptor.');return;}
-    srcNode=nid;pathHL=[];packetPos=null;
-    setStatus('Emisor: <b>'+getNode(nid).label+'</b>.');draw();return;
-  }
-  if(tool==='dest'){
-    if(nid===srcNode){setStatus('Ese nodo ya es el emisor.');return;}
-    dstNode=nid;pathHL=[];packetPos=null;
-    setStatus('Receptor: <b>'+getNode(nid).label+'</b>. Presioná <b>Enviar</b>.');draw();return;
-  }
-  if(tool==='toggle'){
-    if(nid===srcNode||nid===dstNode){setStatus('No podés apagar el emisor o receptor activo.');return;}
-    const n=getNode(nid);n.on=!n.on;
-    if(animId){cancelAnimationFrame(animId);animId=null;}
-    pathHL=[];packetPos=null;
-    setStatus('Nodo <b>'+n.label+'</b> '+(n.on?'encendido ✓':'apagado ✗')+'.');draw();return;
-  }
-  if(tool==='connect'){
-    if(connectStart===null){
-      connectStart=nid;
-      setStatus('Seleccioná el segundo nodo para conectar con <b>'+getNode(nid).label+'</b>.');
-      draw();return;
-    }
-    if(nid===connectStart){
-      connectStart=null;
-      setStatus('Conexión cancelada. Clic en un nodo para iniciar.');
-      draw();return;
-    }
-    if(edgeExists(connectStart,nid)){
-      setStatus('Ya existe una conexión entre <b>'+getNode(connectStart).label+'</b> y <b>'+getNode(nid).label+'</b>.');
-      connectStart=null;draw();return;
-    }
-    edges.push([connectStart,nid]);
-    setStatus('Conexión creada: <b>'+getNode(connectStart).label+'</b> — <b>'+getNode(nid).label+'</b>.');
-    connectStart=null;draw();return;
-  }
-}
-
-cv.addEventListener('mousedown',e=>{
-  const{x,y}=evXY(e);const nid=getNodeAt(x,y);
-  if(tool==='pointer'&&nid!==null){dragging=nid;dragOffX=getNode(nid).x-x;dragOffY=getNode(nid).y-y;cv.style.cursor='grabbing';}
-});
-cv.addEventListener('mouseup',e=>{
-  const{x,y}=evXY(e);
-  if(dragging!==null){dragging=null;cv.style.cursor='default';return;}
-  handleClick(x,y);
-});
-cv.addEventListener('mousemove',e=>{
-  const{x,y}=evXY(e);
-  mouseX=x;mouseY=y;
-  if(dragging!==null){
-    const n=nodes.find(nd=>nd.id===dragging);
-    if(n){n.x=Math.max(R,Math.min(CW-R,x+dragOffX));n.y=Math.max(R,Math.min(CH-R,y+dragOffY));draw();}
-    return;
-  }
-  const hov=getNodeAt(x,y);
-  if(hov!==hoveredNode){hoveredNode=hov;}
-  if(tool==='disconnect'){
-    const eidx=getEdgeAt(x,y);
-    if(eidx!==hoveredEdge){hoveredEdge=eidx;draw();}
-  }
-  if(tool==='connect'&&connectStart!==null){draw();}
-  cv.style.cursor=(hov!==null&&tool==='pointer')?'grab':(tool==='add'?'crosshair':(tool==='disconnect'&&hoveredEdge!==null?'pointer':'default'));
-});
-cv.addEventListener('mouseleave',()=>{dragging=null;hoveredNode=null;hoveredEdge=null;draw();});
-cv.addEventListener('touchstart',e=>{
-  e.preventDefault();const{x,y}=evXY(e,true);const nid=getNodeAt(x,y);
-  if(tool==='pointer'&&nid!==null){dragging=nid;dragOffX=getNode(nid).x-x;dragOffY=getNode(nid).y-y;}
-},{passive:false});
-cv.addEventListener('touchmove',e=>{
-  e.preventDefault();const{x,y}=evXY(e,true);
-  if(dragging!==null){
-    const n=nodes.find(nd=>nd.id===dragging);
-    if(n){n.x=Math.max(R,Math.min(CW-R,x+dragOffX));n.y=Math.max(R,Math.min(CH-R,y+dragOffY));draw();}
-  }
-},{passive:false});
-cv.addEventListener('touchend',e=>{
-  e.preventDefault();if(dragging!==null){dragging=null;return;}
-  const{x,y}=evXY(e,true);handleClick(x,y);
-},{passive:false});
-
-function setTool(t){
-  tool=t;
-  connectStart=null;hoveredEdge=null;
-  document.querySelectorAll('.tb').forEach(el=>el.classList.remove('active'));
-  const b=document.getElementById('btn-'+t);if(b)b.classList.add('active');
-  const h={pointer:'Arrastrá nodos para moverlos.',add:'Clic en espacio vacío para agregar un nodo.',delete:'Clic en un nodo para eliminarlo.',source:'Clic en un nodo para designarlo emisor (TX).',dest:'Clic en un nodo para designarlo receptor (RX).',toggle:'Clic en un nodo para apagarlo o encenderlo.',connect:'Clic en un nodo, luego en otro para conectarlos.',disconnect:'Clic sobre una conexión para eliminarla.'};
-  setStatus(h[t]||'');
-}
-function setStatus(m){document.getElementById('status').innerHTML=m;}
-function updBadge(){document.getElementById('badge').textContent=nodes.length+' nodo'+(nodes.length!==1?'s':'');}
-function resetAll(){if(animId){cancelAnimationFrame(animId);animId=null;}initNetwork();}
-</script>
+  <script src="script.js"></script>
+</body>
+</html>
