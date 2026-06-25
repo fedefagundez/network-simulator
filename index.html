@@ -102,6 +102,16 @@ canvas{display:block;width:100%;height:auto;}
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
       On/Off
     </button>
+    <div class="grp-sep"></div>
+    <span class="grp-label">CONEXIONES</span>
+    <button class="tb" id="btn-connect" onclick="setTool('connect')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Conectar
+    </button>
+    <button class="tb red" id="btn-disconnect" onclick="setTool('disconnect')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Desconectar
+    </button>
   </div>
 
   <div class="canvas-outer" id="canvas-outer">
@@ -130,6 +140,7 @@ const R=22;
 let tool='pointer',nodes=[],edges=[],srcNode=null,dstNode=null;
 let animId=null,dragging=null,dragOffX=0,dragOffY=0,hoveredNode=null;
 let pathHL=[],packetPos=null,packetEdgeIdx=0,packetT=0,addCtr=8;
+let connectStart=null,hoveredEdge=null,mouseX=0,mouseY=0;
 
 function isDark(){return matchMedia('(prefers-color-scheme:dark)').matches;}
 
@@ -304,12 +315,53 @@ function draw(){
     ctx.beginPath();ctx.arc(packetPos.x,packetPos.y,pr+5,0,Math.PI*2);
     ctx.strokeStyle=c.pkt+'55';ctx.lineWidth=1;ctx.stroke();
   }
+
+  if(tool==='connect'&&connectStart!==null){
+    const ns=getNode(connectStart);
+    if(ns){
+      ctx.beginPath();ctx.moveTo(ns.x,ns.y);ctx.lineTo(mouseX,mouseY);
+      ctx.strokeStyle='#3db86b';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);
+    }
+  }
+
+  if(tool==='disconnect'&&hoveredEdge!==null){
+    const[a,b]=edges[hoveredEdge];
+    const na=getNode(a),nb=getNode(b);
+    if(na&&nb){
+      ctx.beginPath();ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);
+      ctx.strokeStyle='#e05b5b';ctx.lineWidth=4;ctx.setLineDash([]);ctx.stroke();
+    }
+  }
 }
 
 function getNodeAt(x,y){
   const nr=nodeR();
   for(const n of nodes)if(Math.hypot(n.x-x,n.y-y)<=nr+6)return n.id;
   return null;
+}
+
+function distToSegment(px,py,ax,ay,bx,by){
+  const dx=bx-ax,dy=by-ay;
+  const lenSq=dx*dx+dy*dy;
+  if(lenSq===0)return Math.hypot(px-ax,py-ay);
+  let t=((px-ax)*dx+(py-ay)*dy)/lenSq;
+  t=Math.max(0,Math.min(1,t));
+  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
+}
+
+function getEdgeAt(x,y){
+  const threshold=8;
+  for(let i=0;i<edges.length;i++){
+    const[a,b]=edges[i];
+    const na=getNode(a),nb=getNode(b);
+    if(!na||!nb)continue;
+    if(distToSegment(x,y,na.x,na.y,nb.x,nb.y)<=threshold)return i;
+  }
+  return null;
+}
+
+function edgeExists(a,b){
+  return edges.some(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
 }
 
 function evXY(e,touch){
@@ -320,14 +372,24 @@ function evXY(e,touch){
 
 function handleClick(x,y){
   const nid=getNodeAt(x,y);
+  if(tool==='disconnect'){
+    const eidx=getEdgeAt(x,y);
+    if(eidx===null){
+      setStatus('Clic sobre una conexión para eliminarla.');
+      return;
+    }
+    const[a,b]=edges[eidx];
+    edges.splice(eidx,1);
+    pathHL=[];packetPos=null;
+    setStatus('Conexión eliminada: <b>'+getNode(a).label+'</b> — <b>'+getNode(b).label+'</b>.');
+    draw();return;
+  }
   if(tool==='add'){
     if(nid!==null)return;
     const label=addCtr<ALPHA.length?ALPHA[addCtr]:String(addCtr);
     const newId=nodes.length?Math.max(...nodes.map(n=>n.id))+1:0;
     nodes.push({id:newId,x,y,on:true,label});addCtr++;
-    const act=nodes.filter(n=>n.id!==newId&&n.on).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y));
-    for(let i=0;i<Math.min(2,act.length);i++)edges.push([newId,act[i].id]);
-    pathHL=[];packetPos=null;setStatus('Nodo <b>'+label+'</b> agregado.');updBadge();draw();return;
+    pathHL=[];packetPos=null;setStatus('Nodo <b>'+label+'</b> agregado. Usá <b>Conectar</b> para enlazarlo.');updBadge();draw();return;
   }
   if(nid===null)return;
   if(tool==='delete'){
@@ -353,6 +415,25 @@ function handleClick(x,y){
     pathHL=[];packetPos=null;
     setStatus('Nodo <b>'+n.label+'</b> '+(n.on?'encendido ✓':'apagado ✗')+'.');draw();return;
   }
+  if(tool==='connect'){
+    if(connectStart===null){
+      connectStart=nid;
+      setStatus('Seleccioná el segundo nodo para conectar con <b>'+getNode(nid).label+'</b>.');
+      draw();return;
+    }
+    if(nid===connectStart){
+      connectStart=null;
+      setStatus('Conexión cancelada. Clic en un nodo para iniciar.');
+      draw();return;
+    }
+    if(edgeExists(connectStart,nid)){
+      setStatus('Ya existe una conexión entre <b>'+getNode(connectStart).label+'</b> y <b>'+getNode(nid).label+'</b>.');
+      connectStart=null;draw();return;
+    }
+    edges.push([connectStart,nid]);
+    setStatus('Conexión creada: <b>'+getNode(connectStart).label+'</b> — <b>'+getNode(nid).label+'</b>.');
+    connectStart=null;draw();return;
+  }
 }
 
 cv.addEventListener('mousedown',e=>{
@@ -366,16 +447,22 @@ cv.addEventListener('mouseup',e=>{
 });
 cv.addEventListener('mousemove',e=>{
   const{x,y}=evXY(e);
+  mouseX=x;mouseY=y;
   if(dragging!==null){
     const n=nodes.find(nd=>nd.id===dragging);
     if(n){n.x=Math.max(R,Math.min(CW-R,x+dragOffX));n.y=Math.max(R,Math.min(CH-R,y+dragOffY));draw();}
     return;
   }
   const hov=getNodeAt(x,y);
-  if(hov!==hoveredNode){hoveredNode=hov;draw();}
-  cv.style.cursor=(hov!==null&&tool==='pointer')?'grab':(tool==='add'?'crosshair':'default');
+  if(hov!==hoveredNode){hoveredNode=hov;}
+  if(tool==='disconnect'){
+    const eidx=getEdgeAt(x,y);
+    if(eidx!==hoveredEdge){hoveredEdge=eidx;draw();}
+  }
+  if(tool==='connect'&&connectStart!==null){draw();}
+  cv.style.cursor=(hov!==null&&tool==='pointer')?'grab':(tool==='add'?'crosshair':(tool==='disconnect'&&hoveredEdge!==null?'pointer':'default'));
 });
-cv.addEventListener('mouseleave',()=>{dragging=null;hoveredNode=null;draw();});
+cv.addEventListener('mouseleave',()=>{dragging=null;hoveredNode=null;hoveredEdge=null;draw();});
 cv.addEventListener('touchstart',e=>{
   e.preventDefault();const{x,y}=evXY(e,true);const nid=getNodeAt(x,y);
   if(tool==='pointer'&&nid!==null){dragging=nid;dragOffX=getNode(nid).x-x;dragOffY=getNode(nid).y-y;}
@@ -394,9 +481,10 @@ cv.addEventListener('touchend',e=>{
 
 function setTool(t){
   tool=t;
+  connectStart=null;hoveredEdge=null;
   document.querySelectorAll('.tb').forEach(el=>el.classList.remove('active'));
   const b=document.getElementById('btn-'+t);if(b)b.classList.add('active');
-  const h={pointer:'Arrastrá nodos para moverlos.',add:'Clic en espacio vacío para agregar un nodo.',delete:'Clic en un nodo para eliminarlo.',source:'Clic en un nodo para designarlo emisor (TX).',dest:'Clic en un nodo para designarlo receptor (RX).',toggle:'Clic en un nodo para apagarlo o encenderlo.'};
+  const h={pointer:'Arrastrá nodos para moverlos.',add:'Clic en espacio vacío para agregar un nodo.',delete:'Clic en un nodo para eliminarlo.',source:'Clic en un nodo para designarlo emisor (TX).',dest:'Clic en un nodo para designarlo receptor (RX).',toggle:'Clic en un nodo para apagarlo o encenderlo.',connect:'Clic en un nodo, luego en otro para conectarlos.',disconnect:'Clic sobre una conexión para eliminarla.'};
   setStatus(h[t]||'');
 }
 function setStatus(m){document.getElementById('status').innerHTML=m;}
