@@ -43,6 +43,7 @@ let connectStart = null;
 let hoveredEdge = null;
 let mouseX = 0;
 let mouseY = 0;
+let clearTimer = null;
 
 function scrToWorld(sx, sy) {
   return { x: (sx - camOffX) / camScale, y: (sy - camOffY) / camScale };
@@ -105,6 +106,7 @@ function nodeR() {
 
 function initNetwork() {
   if (animId) { cancelAnimationFrame(animId); animId = null; }
+  if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
   const px = x => Math.round(x * CW);
   const py = y => Math.round(y * CH);
   nodes = [
@@ -155,23 +157,26 @@ function bfs(src, dst) {
 
 function sendPacket() {
   if (animId) { cancelAnimationFrame(animId); animId = null; }
+  if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
   pathHL = [];
   packetPos = null;
   if (srcNode === null || dstNode === null) {
+    Sounds.error();
     setStatus('Asigná un <b>emisor</b> y un <b>receptor</b> primero.');
     draw();
     return;
   }
   const ns = getNode(srcNode);
   const nd = getNode(dstNode);
-  if (!ns || !ns.on) { setStatus('El emisor está apagado.'); draw(); return; }
-  if (!nd || !nd.on) { setStatus('El receptor está apagado.'); draw(); return; }
-  if (srcNode === dstNode) { setStatus('Emisor y receptor son el mismo nodo.'); draw(); return; }
+  if (!ns || !ns.on) { Sounds.error(); setStatus('El emisor está apagado.'); draw(); return; }
+  if (!nd || !nd.on) { Sounds.error(); setStatus('El receptor está apagado.'); draw(); return; }
+  if (srcNode === dstNode) { Sounds.error(); setStatus('Emisor y receptor son el mismo nodo.'); draw(); return; }
   const path = bfs(srcNode, dstNode);
-  if (!path) { setStatus('Sin ruta — todos los caminos están bloqueados.'); draw(); return; }
+  if (!path) { Sounds.error(); setStatus('Sin ruta — todos los caminos están bloqueados.'); draw(); return; }
   pathHL = path;
   packetEdgeIdx = 0;
   packetT = 0;
+  Sounds.send();
   setStatus('Enviando: ' + path.map(i => getNode(i).label).join(' → '));
   animatePacket();
 }
@@ -183,8 +188,9 @@ function animatePacket() {
     const last = getNode(pathHL[pathHL.length - 1]);
     packetPos = { x: last.x, y: last.y };
     draw();
+    Sounds.deliver();
     setStatus('✓ Entregado a <b>' + (getNode(dstNode) || { label: '?' }).label + '</b> — ruta: ' + pathHL.map(i => getNode(i).label).join(' → '));
-    setTimeout(() => { packetPos = null; pathHL = []; draw(); }, 1500);
+    clearTimer = setTimeout(() => { packetPos = null; pathHL = []; clearTimer = null; draw(); }, 1500);
     animId = null;
     return;
   }
@@ -403,6 +409,7 @@ function handleClick(sx, sy) {
     const newId = nodes.length ? Math.max(...nodes.map(n => n.id)) + 1 : 0;
     nodes.push({ id: newId, x: w.x, y: w.y, on: true, label });
     addCtr++;
+    Sounds.add();
     pathHL = [];
     packetPos = null;
     setStatus('Nodo <b>' + label + '</b> agregado. Usá <b>Conectar</b> para enlazarlo.');
@@ -419,6 +426,7 @@ function handleClick(sx, sy) {
     edges = edges.filter(([a, b]) => a !== nid && b !== nid);
     if (srcNode === nid) srcNode = null;
     if (dstNode === nid) dstNode = null;
+    Sounds.delete();
     pathHL = [];
     packetPos = null;
     setStatus('Nodo <b>' + lbl + '</b> eliminado.');
@@ -428,7 +436,7 @@ function handleClick(sx, sy) {
   }
 
   if (tool === 'source') {
-    if (nid === dstNode) { setStatus('Ese nodo ya es el receptor.'); return; }
+    if (nid === dstNode) { Sounds.error(); setStatus('Ese nodo ya es el receptor.'); return; }
     srcNode = nid;
     pathHL = [];
     packetPos = null;
@@ -438,7 +446,7 @@ function handleClick(sx, sy) {
   }
 
   if (tool === 'dest') {
-    if (nid === srcNode) { setStatus('Ese nodo ya es el emisor.'); return; }
+    if (nid === srcNode) { Sounds.error(); setStatus('Ese nodo ya es el emisor.'); return; }
     dstNode = nid;
     pathHL = [];
     packetPos = null;
@@ -449,6 +457,7 @@ function handleClick(sx, sy) {
 
   if (tool === 'toggle') {
     if (nid === srcNode || nid === dstNode) {
+      Sounds.error();
       setStatus('No podés apagar el emisor o receptor activo.');
       return;
     }
@@ -464,9 +473,10 @@ function handleClick(sx, sy) {
 
   if (tool === 'disconnect') {
     const eidx = getEdgeAt(w.x, w.y);
-    if (eidx === null) { setStatus('Clicá sobre una conexión para eliminarla.'); return; }
+    if (eidx === null) { Sounds.error(); setStatus('Clicá sobre una conexión para eliminarla.'); return; }
     const [a, b] = edges[eidx];
     edges.splice(eidx, 1);
+    Sounds.disconnect();
     pathHL = [];
     packetPos = null;
     setStatus('Conexión eliminada: <b>' + getNode(a).label + '</b> — <b>' + getNode(b).label + '</b>.');
@@ -488,12 +498,14 @@ function handleClick(sx, sy) {
       return;
     }
     if (edgeExists(connectStart, nid)) {
+      Sounds.error();
       setStatus('Ya existe una conexión entre <b>' + getNode(connectStart).label + '</b> y <b>' + getNode(nid).label + '</b>.');
       connectStart = null;
       draw();
       return;
     }
     edges.push([connectStart, nid]);
+    Sounds.connect();
     setStatus('Conexión creada: <b>' + getNode(connectStart).label + '</b> — <b>' + getNode(nid).label + '</b>.');
     connectStart = null;
     draw();
@@ -502,6 +514,7 @@ function handleClick(sx, sy) {
 }
 
 cv.addEventListener('mousedown', e => {
+  Sounds.init();
   const { x, y } = evXY(e);
   const nid = getNodeAt(x, y);
   if (tool === 'pointer' && nid !== null) {
@@ -673,6 +686,7 @@ function updBadge() {
 
 function resetAll() {
   if (animId) { cancelAnimationFrame(animId); animId = null; }
+  if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
   camScale = 1;
   camOffX = 0;
   camOffY = 0;
